@@ -1,73 +1,57 @@
-# React + TypeScript + Vite
+# Calculadora de Propinas y Consumo 🍕🥤
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Una aplicación interactiva desarrollada con **React** y **TypeScript** diseñada para gestionar pedidos en un restaurante. Permite controlar el consumo de los clientes, seleccionar porcentajes de propina y calcular automáticamente los totales de la cuenta.
 
-Currently, two official plugins are available:
+## 🚀 Características Principales
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Menú Dinámico**: Listado de productos cargados desde una base de datos local (`db.ts`).
+- **Gestión Inteligente de la Orden**:
+  - **Agregar Ítems**: Si el producto no existe en el consumo, se añade con cantidad 1.
+  - **Actualizar Cantidad**: Si el producto ya existe, se incrementa la cantidad automáticamente sin duplicar la fila en la interfaz.
+  - **Eliminar Ítems**: Opción para quitar productos específicos de la orden mediante su ID.
+- **Sistema de Propinas**: Selección mediante botones de radio (10%, 20%, 50%) que se aplican al subtotal.
+- **Cálculos en Tiempo Real**: Uso de `useMemo` para calcular Subtotal, Propina y Total a pagar de forma eficiente.
+- **Validación de Pago**: El botón para finalizar la orden se bloquea automáticamente si no hay consumos registrados.
 
-## React Compiler
+## 🛠️ Tecnologías y Conceptos Aplicados
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Custom Hooks (`useOrder`)
 
-## Expanding the ESLint configuration
+Toda la lógica de negocio (agregar, quitar y limpiar la orden) está centralizada en el hook `useOrder.ts`. Esto permite mantener el componente `App.tsx` limpio y enfocado únicamente en la interfaz.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 2. Estado Inmutable y `prev`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Para garantizar que la aplicación sea robusta ante acciones rápidas del usuario, se utiliza la actualización funcional del estado:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+setOrder((prev) => [...prev, newItem]);
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+El uso de prev asegura que siempre estemos trabajando con el valor más actualizado de la orden en la memoria de React, evitando errores de sincronía.
+
+### 3. Transformación de Datos con TypeScript
+
+Se utiliza el operador spread (...item) para convertir un objeto de tipo MenuItem en un OrderItem, agregando la propiedad quantity necesaria para el carrito.
+
+## 📦 Estructura del Proyecto
+
+- src/hooks/useOrder.ts: Lógica principal del estado de la orden (addItem, removeItem, placeOrder).
+
+- src/components/: Componentes modulares como OrderContents, OrderTotals y TipPercentageForm.
+
+- src/data/db.ts: Fuente de datos con los elementos del menú.
+
+- src/helpers/index.ts: Funciones de utilidad para formateo de moneda en USD.
+
+- src/types/index.ts: Definiciones de tipos para MenuItem y OrderItem.
+
+💻 Instalación y Uso
+Instalar las dependencias:
+
+```
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Iniciar la aplicación:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+npm run dev
 ```

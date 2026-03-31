@@ -1,11 +1,13 @@
 import MenuItems from "./components/MenuItems"
 import OrderContens from "./components/OrderContens"
+import OrderTotals from "./components/OrderTotals"
+import TipPercentageForm from "./components/TipPercentageForm"
 import { menuItems } from "./data/db"
 import useOrder from "./hooks/useOrder"
 
 
 function App() {
-  const { addItem } = useOrder()
+  const { order, addItem, removeItem, tip, setTip, placeOrder } = useOrder()
 
   return (
     <>
@@ -27,7 +29,26 @@ function App() {
         </div>
      
             <div className="border border-dashed border-slate-500 p-5 rounded-lg space-y-5">
-              <OrderContens />
+              {order.length > 0 ? (
+                <>
+                 <OrderContens 
+              order={order}
+              removeItem={removeItem}
+              />
+              <TipPercentageForm 
+              tip={tip} 
+              setTip={setTip}
+              />  
+              <OrderTotals 
+              order={order}
+              tip={tip}
+              placeOrder={placeOrder}
+              />
+                </>
+                ):(
+                <p className="text-center">No hay items en el consumo</p>  
+              )}
+             
             </div>
     
        </main>
